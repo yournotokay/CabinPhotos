@@ -20,7 +20,10 @@ if($min >= 30){
   $hour = sprintf('%02d', $hour + 1);
 }
 
-$json = `curl -s -c /tmp/cookies.txt -X POST https://my.radiothermostat.com/rtcoa/login -d "username=$t_user&password=$t_password"; curl -b /tmp/cookies.txt https://my.radiothermostat.com/rtcoa/rest/thermostats/4eee92dfe4b045ea7717d3b7 --silent --connect-timeout 2 --max-time 3 --retry 5 --retry-delay 0`;
+
+$html = `curl -s -c /tmp/cookies.txt https://my.radiothermostat.com/rtcoa/login.html`;
+if(preg_match('/name="_csrf" content="([^"]*)"/',$html,$csrf_arr)) {$csrf = $csrf_arr[1];}
+$json = `curl -s -b /tmp/cookies.txt -c /tmp/cookies2.txt -X POST https://my.radiothermostat.com/rtcoa/login -d "username=$t_user&password=$t_password&_csrf=$csrf&g-recaptcha-response="; curl -b /tmp/cookies2.txt https://my.radiothermostat.com/rtcoa/rest/thermostats/4eee92dfe4b045ea7717d3b7 --silent --connect-timeout 2 --max-time 3 --retry 5 --retry-delay 0`;
 #$json = `curl -s --connect-timeout 10 http://cozycabin.dyndns.org:1031/tstat/temp`;
 
 if(preg_match('/\"temp\":(-?[0-9]+\.[0-9]+)/',$json,$temp_arr)) {$temp1 = $temp_arr[1];}
